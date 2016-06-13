@@ -1,0 +1,38 @@
+{
+	"name": "hofff/contao-language-relations-news",
+	"description": "Maintaining relations between translated news.",
+	"keywords": [ "utility", "translation", "news", "contao" ],
+	"type": "contao-module",
+	"license": "LGPL-3.0+",
+	"authors": [
+		{
+			"name": "Oliver Hoff",
+			"email": "oliver@hofff.com",
+			"homepage": "http://hofff.com/",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": "^5.5 || ^7.0",
+		"contao/core": "^3.2",
+		"contao-community-alliance/composer-plugin": "^2.0",
+		"hofff/contao-selectri": "^3.0",
+		"hofff/contao-language-relations": "^2.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Hofff\\Contao\\LanguageRelations\\News\\": "src/"
+		}
+	},
+	"extra": {
+		"contao": {
+			"sources": {
+				"contao-module": "system/modules/hofff_language_relations_news"
+			},
+			"runonce": [
+				"runonce/01_removeDatabaseResources.php",
+				"runonce/dropViews.php"
+			]
+		}
+	}
+}
