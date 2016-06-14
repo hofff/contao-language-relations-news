@@ -114,7 +114,8 @@ SELECT
 	CONCAT('a', archive.id)		AS tree_root_id,
 	root_page.id				AS root_page_id,
 	grp.id						AS group_id,
-	grp.title					AS group_title
+	grp.title					AS group_title,
+	root_page.language			AS language
 FROM
 	tl_news_archive
 	AS archive
