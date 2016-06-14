@@ -176,6 +176,7 @@ FROM
 JOIN
 	tl_news_archive
 	AS archive
+	ON archive.id = news.pid
 JOIN
 	tl_page
 	AS page
