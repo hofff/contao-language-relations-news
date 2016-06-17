@@ -18,7 +18,7 @@ class LanguageRelationsNews {
 	/**
 	 * @return Relations
 	 */
-	private static function getRelationsInstance() {
+	public static function getRelationsInstance() {
 		isset(self::$relations) || self::$relations = new Relations(
 			'tl_hofff_language_relations_news',
 			'hofff_language_relations_news_item',
