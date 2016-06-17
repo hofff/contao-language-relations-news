@@ -7,3 +7,5 @@ $GLOBALS['TL_HOOKS']['loadDataContainer']['hofff_language_relations_news']
 	= [ 'Hofff\\Contao\\LanguageRelations\\News\\DCA\\NewsDCA', 'hookLoadDataContainer' ];
 $GLOBALS['TL_HOOKS']['sqlCompileCommands']['hofff_language_relations_news']
 	= [ 'Hofff\\Contao\\LanguageRelations\\News\\Database\\Installer', 'hookSQLCompileCommands' ];
+$GLOBALS['TL_HOOKS']['hofff_language_relations_language_switcher']['hofff_language_relations_news']
+	= [ 'Hofff\\Contao\\LanguageRelations\\News\\LanguageRelationsNews', 'hookLanguageSwitcher' ];
