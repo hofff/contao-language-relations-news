@@ -68,4 +68,10 @@ SQL;
 		return $instance->generateNewsUrl($news);
 	}
 
+	/**
+	 * @see \Contao\Module::compile()
+	 */
+	protected function compile() {
+	}
+
 }
