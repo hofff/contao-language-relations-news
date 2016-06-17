@@ -55,7 +55,7 @@ class LanguageRelationsNews {
 
 		$this->prefetchModels($relatedNews);
 
-		foreach(items as $rootPageID => &$item) {
+		foreach($items as $rootPageID => &$item) {
 			if(!isset($relatedNews[$rootPageID])) {
 				continue;
 			}
