@@ -45,7 +45,7 @@ class LanguageRelationsNews {
 
 		$relatedNews = self::getRelationsInstance()->getRelations($currentNews);
 
-		if($module->hofff_language_relations_hide_current) {
+		if(!$module->hofff_language_relations_hide_current) {
 			$relatedNews[$currentPage->hofff_root_page_id] = $currentNews;
 		}
 
