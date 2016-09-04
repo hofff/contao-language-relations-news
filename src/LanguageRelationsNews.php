@@ -2,6 +2,9 @@
 
 namespace Hofff\Contao\LanguageRelations\News;
 
+use Contao\NewsArchiveModel;
+use Contao\NewsModel;
+use Contao\PageModel;
 use Hofff\Contao\LanguageRelations\Module\ModuleLanguageSwitcher;
 use Hofff\Contao\LanguageRelations\News\Util\ContaoNewsUtil;
 use Hofff\Contao\LanguageRelations\Relations;
@@ -44,30 +47,27 @@ class LanguageRelationsNews {
 		}
 
 		$relatedNews = self::getRelationsInstance()->getRelations($currentNews);
+		$relatedNews[$currentPage->hofff_root_page_id] = $currentNews;
 
-		if(!$module->hofff_language_relations_hide_current) {
-			$relatedNews[$currentPage->hofff_root_page_id] = $currentNews;
-		}
-
-		if(!$relatedNews) {
-			return $items;
-		}
-
-		$this->prefetchModels($relatedNews);
+		ContaoNewsUtil::prefetchNewsModels($relatedNews);
 
 		foreach($items as $rootPageID => &$item) {
 			if(!isset($relatedNews[$rootPageID])) {
 				continue;
 			}
 
-			$news = \NewsModel::findByPk($relatedNews[$rootPageID]);
-
+			$news = NewsModel::findByPk($relatedNews[$rootPageID]);
 			if(!ContaoUtil::isPublished($news)) {
 				continue;
 			}
 
-			$archive = $news->getRelated('pid');
-			if(!$archive->jumpTo || !ContaoUtil::isPublished($archive->getRelated('jumpTo'))) {
+			$archive = NewsArchiveModel::findByPk($news->pid);
+			if(!$archive->jumpTo) {
+				continue;
+			}
+
+			$page = PageModel::findByPk($archive->jumpTo);
+			if(!ContaoUtil::isPublished($page)) {
 				continue;
 			}
 
@@ -77,24 +77,6 @@ class LanguageRelationsNews {
 		unset($item);
 
 		return $items;
-	}
-
-	/**
-	 * @param array $relatedNews
-	 * @return void
-	 */
-	protected function prefetchModels(array $relatedNews) {
-		$archives = [];
-		foreach(\NewsModel::findMultipleByIds($relatedNews) as $news) {
-			$archives[] = $news->pid;
-		}
-
-		$pages = [];
-		foreach(\NewsArchiveModel::findMultipleByIds($archives) as $archive) {
-			$archive->jumpTo && $pages[] = $archive->jumpTo;
-		}
-
-		\PageModel::findMultipleByIds($pages);
 	}
 
 }

@@ -2,12 +2,18 @@
 
 namespace Hofff\Contao\LanguageRelations\News\Util;
 
+use Contao\Config;
+use Contao\Input;
+use Contao\ModuleNews;
+use Contao\NewsArchiveModel;
+use Contao\NewsModel;
+use Contao\PageModel;
 use Hofff\Contao\LanguageRelations\Util\QueryUtil;
 
 /**
  * @author Oliver Hoff <oliver@hofff.com>
  */
-class ContaoNewsUtil extends \ModuleNews {
+class ContaoNewsUtil extends ModuleNews {
 
 	/**
 	 */
@@ -20,9 +26,9 @@ class ContaoNewsUtil extends \ModuleNews {
 	 */
 	public static function findCurrentNews($jumpTo = null) {
 		if(isset($_GET['items'])) {
-			$idOrAlias = \Input::get('items', false, true);
-		} elseif(isset($_GET['auto_item']) && \Config::get('useAutoItem')) {
-			$idOrAlias = \Input::get('auto_item', false, true);
+			$idOrAlias = Input::get('items', false, true);
+		} elseif(isset($_GET['auto_item']) && Config::get('useAutoItem')) {
+			$idOrAlias = Input::get('auto_item', false, true);
 		} else {
 			return null;
 		}
@@ -59,13 +65,31 @@ SQL;
 	}
 
 	/**
-	 * @param \NewsModel $news
+	 * @param NewsModel $news
 	 * @return string
 	 */
-	public static function getNewsURL(\NewsModel $news) {
+	public static function getNewsURL(NewsModel $news) {
 		static $instance;
 		$instance || $instance = new self;
 		return $instance->generateNewsUrl($news);
+	}
+
+	/**
+	 * @param array $relatedNews
+	 * @return void
+	 */
+	public static function prefetchNewsModels(array $ids) {
+		$archives = [];
+		foreach(NewsModel::findMultipleByIds(array_values($ids)) as $news) {
+			$archives[] = $news->pid;
+		}
+
+		$pages = [];
+		foreach(NewsArchiveModel::findMultipleByIds($archives) as $archive) {
+			$archive->jumpTo && $pages[] = $archive->jumpTo;
+		}
+
+		PageModel::findMultipleByIds($pages);
 	}
 
 	/**

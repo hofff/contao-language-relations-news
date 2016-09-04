@@ -2,6 +2,7 @@
 
 namespace Hofff\Contao\LanguageRelations\News\Database;
 
+use Contao\Database;
 use Hofff\Contao\LanguageRelations\Util\StringUtil;
 
 /**
@@ -14,7 +15,7 @@ class Installer {
 	 * @return void
 	 */
 	public function hookSQLCompileCommands($queries) {
-		$tables = array_flip(\Database::getInstance()->listTables(null, true));
+		$tables = array_flip(Database::getInstance()->listTables(null, true));
 
 		if(!isset($tables['hofff_language_relations_news_item'])) {
 			$queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getItemView());
