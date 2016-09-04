@@ -75,7 +75,7 @@ SQL;
 	}
 
 	/**
-	 * @param array $relatedNews
+	 * @param array $ids
 	 * @return void
 	 */
 	public static function prefetchNewsModels(array $ids) {
