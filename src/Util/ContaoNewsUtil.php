@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hofff\Contao\LanguageRelations\News\Util;
 
 use Contao\Config;
@@ -9,31 +11,25 @@ use Contao\NewsArchiveModel;
 use Contao\NewsModel;
 use Contao\PageModel;
 use Hofff\Contao\LanguageRelations\Util\QueryUtil;
+use function array_values;
 
-/**
- * @author Oliver Hoff <oliver@hofff.com>
- */
-class ContaoNewsUtil extends ModuleNews {
+class ContaoNewsUtil extends ModuleNews
+{
+    public function __construct()
+    {
+    }
 
-	/**
-	 */
-	public function __construct() {
-	}
+    public static function findCurrentNews(?int $jumpTo = null) : ?int
+    {
+        if (isset($_GET['items'])) {
+            $idOrAlias = Input::get('items', false, true);
+        } elseif (isset($_GET['auto_item']) && Config::get('useAutoItem')) {
+            $idOrAlias = Input::get('auto_item', false, true);
+        } else {
+            return null;
+        }
 
-	/**
-	 * @param integer|null $jumpTo
-	 * @return integer|null
-	 */
-	public static function findCurrentNews($jumpTo = null) {
-		if(isset($_GET['items'])) {
-			$idOrAlias = Input::get('items', false, true);
-		} elseif(isset($_GET['auto_item']) && Config::get('useAutoItem')) {
-			$idOrAlias = Input::get('auto_item', false, true);
-		} else {
-			return null;
-		}
-
-		$sql = <<<SQL
+        $sql    = <<<SQL
 SELECT
 	news.id			AS news_id,
 	archive.jumpTo	AS archive_jump_to
@@ -47,55 +43,52 @@ JOIN
 WHERE
 	news.id = ? OR news.alias = ?
 SQL;
-		$result = QueryUtil::query(
-			$sql,
-			null,
-			[ $idOrAlias, $idOrAlias ]
-		);
+        $result = QueryUtil::query(
+            $sql,
+            null,
+            [ $idOrAlias, $idOrAlias ]
+        );
 
-		if(!$result->numRows) {
-			return null;
-		}
+        if (! $result->numRows) {
+            return null;
+        }
 
-		if($jumpTo === null || $jumpTo == $result->archive_jump_to) {
-			return $result->news_id;
-		}
+        if ($jumpTo === null || $jumpTo === $result->archive_jump_to) {
+            return $result->news_id;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * @param NewsModel $news
-	 * @return string
-	 */
-	public static function getNewsURL(NewsModel $news) {
-		static $instance;
-		$instance || $instance = new self;
-		return $instance->generateNewsUrl($news);
-	}
+    public static function getNewsURL(NewsModel $news) : string
+    {
+        static $instance;
+        $instance || $instance = new self();
+        return $instance->generateNewsUrl($news);
+    }
 
-	/**
-	 * @param array $ids
-	 * @return void
-	 */
-	public static function prefetchNewsModels(array $ids) {
-		$archives = [];
-		foreach(NewsModel::findMultipleByIds(array_values($ids)) as $news) {
-			$archives[] = $news->pid;
-		}
+    /**
+     * @param int[] $ids
+     */
+    public static function prefetchNewsModels(array $ids) : void
+    {
+        $archives = [];
+        foreach (NewsModel::findMultipleByIds(array_values($ids)) as $news) {
+            $archives[] = $news->pid;
+        }
 
-		$pages = [];
-		foreach(NewsArchiveModel::findMultipleByIds($archives) as $archive) {
-			$archive->jumpTo && $pages[] = $archive->jumpTo;
-		}
+        $pages = [];
+        foreach (NewsArchiveModel::findMultipleByIds($archives) as $archive) {
+            $archive->jumpTo && $pages[] = $archive->jumpTo;
+        }
 
-		PageModel::findMultipleByIds($pages);
-	}
+        PageModel::findMultipleByIds($pages);
+    }
 
-	/**
-	 * @see \Contao\Module::compile()
-	 */
-	protected function compile() {
-	}
-
+    /**
+     * @see \Contao\Module::compile()
+     */
+    protected function compile() : void
+    {
+    }
 }

@@ -1,37 +1,39 @@
 {
-	"name": "hofff/contao-language-relations-news",
-	"description": "Maintaining relations between translated news.",
-	"keywords": [ "utility", "translation", "news", "contao" ],
-	"type": "contao-module",
-	"license": "LGPL-3.0+",
-	"authors": [
-		{
-			"name": "Oliver Hoff",
-			"email": "oliver@hofff.com",
-			"homepage": "http://hofff.com/",
-			"role": "Developer"
-		}
-	],
-	"require": {
-		"php": "^5.5 || ^7.0",
-		"contao/core": "^3.5",
-		"contao-community-alliance/composer-plugin": "^2.0",
-		"hofff/contao-language-relations": "^2.0-rc2"
-	},
-	"autoload": {
-		"psr-4": {
-			"Hofff\\Contao\\LanguageRelations\\News\\": "src/"
-		}
-	},
-	"extra": {
-		"contao": {
-			"sources": {
-				"contao-module": "system/modules/hofff_language_relations_news"
-			},
-			"runonce": [
-				"runonce/01_removeDatabaseResources.php",
-				"runonce/dropViews.php"
-			]
-		}
-	}
+  "name": "hofff/contao-language-relations-news",
+  "description": "Maintaining relations between translated news.",
+  "keywords": [ "utility", "translation", "news", "contao" ],
+  "type": "contao-bundle",
+  "license": "LGPL-3.0+",
+  "authors": [
+    {
+      "name": "Nicky Hoff",
+      "email": "nick@hofff.com",
+      "homepage": "https://www.hofff.com",
+      "role": "Manager"
+    }
+  ],
+  "require": {
+    "php": "^7.2",
+    "contao/core-bundle": "^4.4",
+    "contao/news-bundle": "^4.4",
+    "hofff/contao-language-relations": "^3.0@dev",
+    "hofff/contao-root-relations": "^3.0@dev",
+    "symfony/http-kernel": "^3.3 || ^4.0"
+  },
+  "require-dev": {
+    "contao/manager-plugin": "^2.1",
+    "doctrine/coding-standard": "^5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hofff\\Contao\\LanguageRelations\\News\\": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-release/3.0": "3.0.x-dev",
+      "dev-support/1.x": "1.0.x-dev"
+    },
+    "contao-manager-plugin": "Hofff\\Contao\\LanguageRelations\\News\\ContaoManager\\Plugin"
+  }
 }
