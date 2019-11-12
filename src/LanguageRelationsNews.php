@@ -40,7 +40,7 @@ class LanguageRelationsNews
     {
         $currentPage = $GLOBALS['objPage'];
 
-        $currentNews = ContaoNewsUtil::findCurrentNews($currentPage->id);
+        $currentNews = ContaoNewsUtil::findCurrentNews((int) $currentPage->id);
         if (! $currentNews) {
             return $items;
         }
