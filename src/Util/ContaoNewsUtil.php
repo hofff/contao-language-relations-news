@@ -29,20 +29,20 @@ class ContaoNewsUtil extends ModuleNews
             return null;
         }
 
-        $sql    = <<<SQL
+        $sql    = '
 SELECT
-	news.id			AS news_id,
-	archive.jumpTo	AS archive_jump_to
+    news.id        AS news_id,
+    archive.jumpTo AS archive_jump_to
 FROM
-	tl_news
-	AS news
+    tl_news
+    AS news
 JOIN
-	tl_news_archive
-	AS archive
-	ON archive.id = news.pid
+    tl_news_archive
+    AS archive
+    ON archive.id = news.pid
 WHERE
-	news.id = ? OR news.alias = ?
-SQL;
+    news.id = ? OR news.alias = ?
+';
         $result = QueryUtil::query(
             $sql,
             null,
