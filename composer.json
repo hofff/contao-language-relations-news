@@ -16,8 +16,8 @@
     "php": "^7.2",
     "contao/core-bundle": "^4.4",
     "contao/news-bundle": "^4.4",
-    "hofff/contao-language-relations": "^3.0@dev",
-    "hofff/contao-root-relations": "^3.0@dev",
+    "hofff/contao-language-relations": "^3.0",
+    "hofff/contao-root-relations": "^3.0",
     "symfony/http-kernel": "^3.3 || ^4.0"
   },
   "require-dev": {
@@ -31,8 +31,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-release/3.0": "3.0.x-dev",
-      "dev-support/1.x": "1.0.x-dev"
+      "dev-master": "3.0.x-dev"
     },
     "contao-manager-plugin": "Hofff\\Contao\\LanguageRelations\\News\\ContaoManager\\Plugin"
   }
