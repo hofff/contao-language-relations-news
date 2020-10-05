@@ -17,18 +17,16 @@ class Installer
      */
     public function hookSQLCompileCommands(array $queries) : array
     {
-        $tables = array_flip(Database::getInstance()->listTables(null, true));
-
-        if (! isset($tables['hofff_language_relations_news_item'])) {
+        if (! self::hasView('hofff_language_relations_news_item')) {
             $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getItemView());
         }
-        if (! isset($tables['hofff_language_relations_news_relation'])) {
+        if (! self::hasView('hofff_language_relations_news_relation')) {
             $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getRelationView());
         }
-        if (! isset($tables['hofff_language_relations_news_aggregate'])) {
+        if (! self::hasView('hofff_language_relations_news_aggregate')) {
             $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getAggregateView());
         }
-        if (! isset($tables['hofff_language_relations_news_tree'])) {
+        if (! self::hasView('hofff_language_relations_news_tree')) {
             $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getTreeView());
         }
 
@@ -37,7 +35,7 @@ class Installer
 
     protected function getItemView() : string
     {
-        return '
+        return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_item AS
 
 SELECT
@@ -60,12 +58,12 @@ JOIN
     tl_page
     AS root_page
     ON root_page.id = page.hofff_root_page_id
-';
+SQL;
     }
 
     protected function getRelationView() : string
     {
-        return '
+        return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_relation AS
 
 SELECT
@@ -98,21 +96,21 @@ LEFT JOIN
     AS reflected_relation
     ON reflected_relation.item_id = relation.related_item_id
     AND reflected_relation.related_item_id = relation.item_id
-';
+SQL;
     }
 
     protected function getAggregateView() : string
     {
-        return '
+        return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_aggregate AS
 
 SELECT
-    archive.id                    AS aggregate_id,
-    CONCAT(\'a\', archive.id)    AS tree_root_id,
+    archive.id                  AS aggregate_id,
+    CONCAT('a', archive.id)     AS tree_root_id,
     root_page.id                AS root_page_id,
-    grp.id                        AS group_id,
-    grp.title                    AS group_title,
-    root_page.language            AS language
+    grp.id                      AS group_id,
+    grp.title                   AS group_title,
+    root_page.language          AS language
 FROM
     tl_news_archive
     AS archive
@@ -128,22 +126,22 @@ JOIN
     tl_hofff_language_relations_group
     AS grp
     ON grp.id = root_page.hofff_language_relations_group_id
-';
+SQL;
     }
 
     protected function getTreeView() : string
     {
-        return '
+        return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_tree AS
 
 SELECT
     0                                           AS pid,
-    CONCAT(\'a\', archive.id)                   AS id,
+    CONCAT('a', archive.id)                     AS id,
     archive.title                               AS title,
     0                                           AS selectable,
     root_page.hofff_language_relations_group_id AS group_id,
     root_page.language                          AS language,
-    \'archive\'                                 AS type,
+    'archive'                                   AS type,
     NULL                                        AS date
 FROM
     tl_news_archive
@@ -158,14 +156,14 @@ JOIN
     ON root_page.id = page.hofff_root_page_id
 
 UNION SELECT
-    CONCAT(\'a\', archive.id)                                        AS pid,
-    CONCAT(\'a\', archive.id, \'_\', YEAR(FROM_UNIXTIME(news.date))) AS id,
-    YEAR(FROM_UNIXTIME(news.date))                                   AS title,
-    0                                                                AS selectable,
-    root_page.hofff_language_relations_group_id                      AS group_id,
-    root_page.language                                               AS language,
-    \'year\'                                                         AS type,
-    YEAR(FROM_UNIXTIME(news.date))                                   AS date
+    CONCAT('a', archive.id)                                         AS pid,
+    CONCAT('a', archive.id, '_', YEAR(FROM_UNIXTIME(news.date)))    AS id,
+    YEAR(FROM_UNIXTIME(news.date))                                  AS title,
+    0                                                               AS selectable,
+    root_page.hofff_language_relations_group_id                     AS group_id,
+    root_page.language                                              AS language,
+    'year'                                                          AS type,
+    YEAR(FROM_UNIXTIME(news.date))                                  AS date
 FROM
     tl_news
     AS news
@@ -188,14 +186,14 @@ GROUP BY
     root_page.hofff_language_relations_group_id
 
 UNION SELECT
-    CONCAT(\'a\', archive.id, \'_\', YEAR(FROM_UNIXTIME(news.date))) AS pid,
-    news.id                                                          AS id,
-    news.headline                                                    AS title,
-    1                                                                AS selectable,
-    root_page.hofff_language_relations_group_id                      AS group_id,
-    root_page.language                                               AS language,
-    \'entry\'                                                        AS type,
-    news.date                                                        AS date
+    CONCAT('a', archive.id, '_', YEAR(FROM_UNIXTIME(news.date)))    AS pid,
+    news.id                                                         AS id,
+    news.headline                                                   AS title,
+    1                                                               AS selectable,
+    root_page.hofff_language_relations_group_id                     AS group_id,
+    root_page.language                                              AS language,
+    'entry'                                                         AS type,
+    news.date                                                       AS date
 FROM
     tl_news
     AS news
@@ -211,6 +209,11 @@ JOIN
     tl_page
     AS root_page
     ON root_page.id = page.hofff_root_page_id
-';
+SQL;
+    }
+
+    private static function hasView(string $view) : bool
+    {
+        return (bool) Database::getInstance()->prepare('SHOW TABLES LIKE ?')->execute($view)->numRows;
     }
 }
