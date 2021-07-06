@@ -53,8 +53,8 @@ WHERE
             return null;
         }
 
-        if ($jumpTo === null || $jumpTo === $result->archive_jump_to) {
-            return $result->news_id;
+        if ($jumpTo === null || $jumpTo === (int) $result->archive_jump_to) {
+            return (int) $result->news_id;
         }
 
         return null;
