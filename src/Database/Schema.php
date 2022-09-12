@@ -4,50 +4,11 @@ declare(strict_types=1);
 
 namespace Hofff\Contao\LanguageRelations\News\Database;
 
-use Contao\Database;
-use Hofff\Contao\LanguageRelations\Util\StringUtil;
+use Doctrine\DBAL\Schema\View;
 
-class Installer
+final class Schema
 {
-    /**
-     * @param string[][] $queries
-     *
-     * @return string[][]
-     */
-    public function hookSQLCompileCommands(array $queries): array
-    {
-        if (! self::hasView('hofff_language_relations_news_item')) {
-            $queries['ALTER_CHANGE']['hofff_language_relations_news_item'] = StringUtil::tabsToSpaces(
-                $this->getItemView()
-            );
-        }
-
-        if (! self::hasView('hofff_language_relations_news_relation')) {
-            $queries['ALTER_CHANGE']['hofff_language_relations_news_relation'] = StringUtil::tabsToSpaces(
-                $this->getRelationView()
-            );
-        }
-
-        if (! self::hasView('hofff_language_relations_news_aggregate')) {
-            $queries['ALTER_CHANGE']['hofff_language_relations_news_aggregate'] = StringUtil::tabsToSpaces(
-                $this->getAggregateView()
-            );
-        }
-
-        if (! self::hasView('hofff_language_relations_news_tree')) {
-            $queries['ALTER_CHANGE']['hofff_language_relations_news_tree'] = StringUtil::tabsToSpaces(
-                $this->getTreeView()
-            );
-        }
-
-        return $queries;
-    }
-
-    protected function getItemView(): string
-    {
-        return <<<SQL
-CREATE OR REPLACE VIEW hofff_language_relations_news_item AS
-
+    private const ITEM_VIEW = <<<SQL
 SELECT
     root_page.hofff_language_relations_group_id AS group_id,
     root_page.id                                AS root_page_id,
@@ -69,13 +30,8 @@ JOIN
     AS root_page
     ON root_page.id = page.hofff_root_page_id
 SQL;
-    }
 
-    protected function getRelationView(): string
-    {
-        return <<<SQL
-CREATE OR REPLACE VIEW hofff_language_relations_news_relation AS
-
+    private const RELATION_VIEW = <<<SQL
 SELECT
     item.group_id                                    AS group_id,
     item.root_page_id                                AS root_page_id,
@@ -107,13 +63,8 @@ LEFT JOIN
     ON reflected_relation.item_id = relation.related_item_id
     AND reflected_relation.related_item_id = relation.item_id
 SQL;
-    }
 
-    protected function getAggregateView(): string
-    {
-        return <<<SQL
-CREATE OR REPLACE VIEW hofff_language_relations_news_aggregate AS
-
+    private const AGGREGATE_VIEW = <<<SQL
 SELECT
     archive.id                  AS aggregate_id,
     CONCAT('a', archive.id)     AS tree_root_id,
@@ -137,13 +88,8 @@ JOIN
     AS grp
     ON grp.id = root_page.hofff_language_relations_group_id
 SQL;
-    }
 
-    protected function getTreeView(): string
-    {
-        return <<<SQL
-CREATE OR REPLACE VIEW hofff_language_relations_news_tree AS
-
+    private const TREE_VIEW = <<<'SQL'
 SELECT
     0                                           AS pid,
     CONCAT('a', archive.id)                     AS id,
@@ -220,10 +166,23 @@ JOIN
     AS root_page
     ON root_page.id = page.hofff_root_page_id
 SQL;
+
+    /** @var list<View> */
+    private array $views;
+
+    public function __construct()
+    {
+        $this->views = [
+            new View('hofff_language_relations_news_item', self::ITEM_VIEW),
+            new View('hofff_language_relations_news_relation', self::RELATION_VIEW),
+            new View('hofff_language_relations_news_aggregate', self::AGGREGATE_VIEW),
+            new View('hofff_language_relations_news_tree', self::TREE_VIEW),
+        ];
     }
 
-    private static function hasView(string $view): bool
+    /** @return iterable<View> */
+    public function views(): iterable
     {
-        return (bool) Database::getInstance()->prepare('SHOW TABLES LIKE ?')->execute($view)->numRows;
+        return $this->views;
     }
 }

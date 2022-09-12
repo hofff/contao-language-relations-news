@@ -9,6 +9,14 @@
     <projectFiles>
         <directory name="src"/>
     </projectFiles>
+    
+    <issueHandlers>
+        <DeprecatedMethod>
+            <errorLevel type="suppress">
+                <referencedMethod name="Doctrine\DBAL\Connection::getSchemaManager"/>
+            </errorLevel>
+        </DeprecatedMethod>
+    </issueHandlers>
 
     <universalObjectCrates>
         <class name="Contao\Database\Statement"/>
