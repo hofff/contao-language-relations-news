@@ -6,7 +6,8 @@ namespace Hofff\Contao\LanguageRelations\News\DCA;
 
 class NewsDCA
 {
-    public function hookLoadDataContainer(string $table) : void
+    /** @SuppressWarnings(PHPMD.Superglobals) */
+    public function hookLoadDataContainer(string $table): void
     {
         if ($table !== 'tl_news') {
             return;
@@ -21,6 +22,7 @@ class NewsDCA
             $palette .= ';{hofff_language_relations_legend}';
             $palette .= ',hofff_language_relations';
         }
+
         unset($palette, $palettes);
     }
 }

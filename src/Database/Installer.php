@@ -6,7 +6,6 @@ namespace Hofff\Contao\LanguageRelations\News\Database;
 
 use Contao\Database;
 use Hofff\Contao\LanguageRelations\Util\StringUtil;
-use function array_flip;
 
 class Installer
 {
@@ -15,25 +14,36 @@ class Installer
      *
      * @return string[][]
      */
-    public function hookSQLCompileCommands(array $queries) : array
+    public function hookSQLCompileCommands(array $queries): array
     {
         if (! self::hasView('hofff_language_relations_news_item')) {
-            $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getItemView());
+            $queries['ALTER_CHANGE']['hofff_language_relations_news_item'] = StringUtil::tabsToSpaces(
+                $this->getItemView()
+            );
         }
+
         if (! self::hasView('hofff_language_relations_news_relation')) {
-            $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getRelationView());
+            $queries['ALTER_CHANGE']['hofff_language_relations_news_relation'] = StringUtil::tabsToSpaces(
+                $this->getRelationView()
+            );
         }
+
         if (! self::hasView('hofff_language_relations_news_aggregate')) {
-            $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getAggregateView());
+            $queries['ALTER_CHANGE']['hofff_language_relations_news_aggregate'] = StringUtil::tabsToSpaces(
+                $this->getAggregateView()
+            );
         }
+
         if (! self::hasView('hofff_language_relations_news_tree')) {
-            $queries['ALTER_CHANGE'][] = StringUtil::tabsToSpaces($this->getTreeView());
+            $queries['ALTER_CHANGE']['hofff_language_relations_news_tree'] = StringUtil::tabsToSpaces(
+                $this->getTreeView()
+            );
         }
 
         return $queries;
     }
 
-    protected function getItemView() : string
+    protected function getItemView(): string
     {
         return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_item AS
@@ -61,7 +71,7 @@ JOIN
 SQL;
     }
 
-    protected function getRelationView() : string
+    protected function getRelationView(): string
     {
         return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_relation AS
@@ -99,7 +109,7 @@ LEFT JOIN
 SQL;
     }
 
-    protected function getAggregateView() : string
+    protected function getAggregateView(): string
     {
         return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_aggregate AS
@@ -129,7 +139,7 @@ JOIN
 SQL;
     }
 
-    protected function getTreeView() : string
+    protected function getTreeView(): string
     {
         return <<<SQL
 CREATE OR REPLACE VIEW hofff_language_relations_news_tree AS
@@ -212,7 +222,7 @@ JOIN
 SQL;
     }
 
-    private static function hasView(string $view) : bool
+    private static function hasView(string $view): bool
     {
         return (bool) Database::getInstance()->prepare('SHOW TABLES LIKE ?')->execute($view)->numRows;
     }

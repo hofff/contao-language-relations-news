@@ -7,27 +7,24 @@ namespace Hofff\Contao\LanguageRelations\News;
 use Contao\NewsArchiveModel;
 use Contao\NewsModel;
 use Contao\PageModel;
-use Hofff\Contao\LanguageRelations\Module\ModuleLanguageSwitcher;
 use Hofff\Contao\LanguageRelations\News\Util\ContaoNewsUtil;
 use Hofff\Contao\LanguageRelations\Relations;
 use Hofff\Contao\LanguageRelations\Util\ContaoUtil;
+
 use function strip_tags;
 
 class LanguageRelationsNews
 {
-    /** @var Relations */
-    private static $relations;
+    private static ?Relations $relations = null;
 
-    /**
-     * @deprecated
-     */
-    public static function getRelationsInstance() : Relations
+    public static function getRelationsInstance(): Relations
     {
         isset(self::$relations) || self::$relations = new Relations(
             'tl_hofff_language_relations_news',
             'hofff_language_relations_news_item',
             'hofff_language_relations_news_relation'
         );
+
         return self::$relations;
     }
 
@@ -35,8 +32,11 @@ class LanguageRelationsNews
      * @param string[][] $items
      *
      * @return string[][]
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function hookLanguageSwitcher(array $items, ModuleLanguageSwitcher $module) : array
+    public function hookLanguageSwitcher(array $items): array
     {
         $currentPage = $GLOBALS['objPage'];
 
@@ -45,6 +45,7 @@ class LanguageRelationsNews
             return $items;
         }
 
+        /** @var int[] $relatedNews */
         $relatedNews                                   = self::getRelationsInstance()->getRelations($currentNews);
         $relatedNews[$currentPage->hofff_root_page_id] = $currentNews;
 
@@ -56,23 +57,24 @@ class LanguageRelationsNews
             }
 
             $news = NewsModel::findByPk($relatedNews[$rootPageID]);
-            if (! ContaoUtil::isPublished($news)) {
+            if (! $news || ! ContaoUtil::isPublished($news)) {
                 continue;
             }
 
             $archive = NewsArchiveModel::findByPk($news->pid);
-            if (! $archive->jumpTo) {
+            if (! $archive || ! $archive->jumpTo) {
                 continue;
             }
 
             $page = PageModel::findByPk($archive->jumpTo);
-            if (! ContaoUtil::isPublished($page)) {
+            if (! $page || ! ContaoUtil::isPublished($page)) {
                 continue;
             }
 
             $item['href']      = ContaoNewsUtil::getNewsURL($news);
             $item['pageTitle'] = strip_tags($news->headline);
         }
+
         unset($item);
 
         return $items;
