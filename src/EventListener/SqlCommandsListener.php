@@ -35,7 +35,7 @@ final class SqlCommandsListener
                 continue;
             }
 
-            $queries[$view->getName()] = $this->connection->getDatabasePlatform()->getCreateViewSQL(
+            $queries['hofff-contao-language-relations-news'][$view->getName()] = $this->connection->getDatabasePlatform()->getCreateViewSQL(
                 $view->getName(),
                 $view->getSql()
             );
