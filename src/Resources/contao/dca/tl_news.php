@@ -7,7 +7,7 @@ use Hofff\Contao\LanguageRelations\DCA\RelationsDCABuilderConfig;
 use Hofff\Contao\LanguageRelations\Relations;
 use Hofff\Contao\Selectri\Model\Tree\SQLAdjacencyTreeDataFactory;
 
-call_user_func(static function () : void {
+call_user_func(static function (): void {
     $relations = new Relations(
         'tl_hofff_language_relations_news',
         'hofff_language_relations_news_item',
@@ -20,8 +20,8 @@ call_user_func(static function () : void {
     $config->setAggregateView('hofff_language_relations_news_aggregate');
     $config->setTreeView('hofff_language_relations_news_tree');
     $config->setSelectriDataFactoryConfiguratorCallback(
-        static function (SQLAdjacencyTreeDataFactory $factory) : void {
-            $factory->getConfig()->addColumns([ 'date', 'type' ]);
+        static function (SQLAdjacencyTreeDataFactory $factory): void {
+            $factory->getConfig()->addColumns(['date', 'type']);
             $factory->getConfig()->setOrderByExpr('date DESC, title');
         }
     );

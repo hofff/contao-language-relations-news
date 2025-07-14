@@ -6,20 +6,19 @@ namespace Hofff\Contao\LanguageRelations\News\Util;
 
 use Contao\Config;
 use Contao\Input;
-use Contao\ModuleNews;
+use Contao\Model\Collection;
+use Contao\News;
 use Contao\NewsArchiveModel;
 use Contao\NewsModel;
 use Contao\PageModel;
 use Hofff\Contao\LanguageRelations\Util\QueryUtil;
+
 use function array_values;
 
-class ContaoNewsUtil extends ModuleNews
+final class ContaoNewsUtil
 {
-    public function __construct()
-    {
-    }
-
-    public static function findCurrentNews(?int $jumpTo = null) : ?int
+    /** @SuppressWarnings(PHPMD.Superglobals) */
+    public static function findCurrentNews(?int $jumpTo = null): ?int
     {
         if (isset($_GET['items'])) {
             $idOrAlias = Input::get('items', false, true);
@@ -46,7 +45,7 @@ WHERE
         $result = QueryUtil::query(
             $sql,
             null,
-            [ $idOrAlias, $idOrAlias ]
+            [$idOrAlias, $idOrAlias]
         );
 
         if (! $result->numRows) {
@@ -60,35 +59,30 @@ WHERE
         return null;
     }
 
-    public static function getNewsURL(NewsModel $news) : string
+    public static function getNewsURL(NewsModel $news): string
     {
-        static $instance;
-        $instance || $instance = new self();
-        return $instance->generateNewsUrl($news);
+        return News::generateNewsUrl($news);
     }
 
-    /**
-     * @param int[] $ids
-     */
-    public static function prefetchNewsModels(array $ids) : void
+    /** @param int[] $ids */
+    public static function prefetchNewsModels(array $ids): void
     {
-        $archives = [];
-        foreach (NewsModel::findMultipleByIds(array_values($ids)) as $news) {
-            $archives[] = $news->pid;
+        $archives   = [];
+        $collection = NewsModel::findMultipleByIds(array_values($ids));
+        if ($collection instanceof Collection) {
+            foreach ($collection as $news) {
+                $archives[] = $news->pid;
+            }
         }
 
-        $pages = [];
-        foreach (NewsArchiveModel::findMultipleByIds($archives) as $archive) {
-            $archive->jumpTo && $pages[] = $archive->jumpTo;
+        $pages      = [];
+        $collection = NewsArchiveModel::findMultipleByIds($archives);
+        if ($collection instanceof Collection) {
+            foreach ($collection as $archive) {
+                $archive->jumpTo && $pages[] = $archive->jumpTo;
+            }
         }
 
         PageModel::findMultipleByIds($pages);
-    }
-
-    /**
-     * @see \Contao\Module::compile()
-     */
-    protected function compile() : void
-    {
     }
 }

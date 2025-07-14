@@ -1,9 +1,14 @@
 {
   "name": "hofff/contao-language-relations-news",
   "description": "Maintaining relations between translated news.",
-  "keywords": [ "utility", "translation", "news", "contao" ],
-  "type": "contao-bundle",
   "license": "LGPL-3.0-or-later",
+  "type": "contao-bundle",
+  "keywords": [
+    "utility",
+    "translation",
+    "news",
+    "contao"
+  ],
   "authors": [
     {
       "name": "Nicky Hoff",
@@ -31,21 +36,34 @@
     }
   ],
   "require": {
-    "php": "^7.2",
-    "contao/core-bundle": "^4.4",
-    "contao/news-bundle": "^4.4",
+    "php": "^7.4 || ^8.0",
+    "contao/core-bundle": "^4.9",
+    "contao/news-bundle": "^4.9",
+    "doctrine/dbal": "^2.11 || ^3.0",
     "hofff/contao-language-relations": "^3.0",
-    "symfony/dependency-injection": "^3.4.26 || ^4.2.7",
-    "symfony/http-kernel": "^3.4.26 || ^4.2.7"
+    "symfony/config": "^4.4 || ^5.1",
+    "symfony/dependency-injection": "^4.4 || ^5.1",
+    "symfony/filesystem": "^4.4 || ^5.1",
+    "symfony/http-kernel": "^4.4 || ^5.1"
   },
   "require-dev": {
     "contao/manager-plugin": "^2.1",
-    "doctrine/coding-standard": "^5.0",
-    "slevomat/coding-standard": "^4.8.6"
+    "doctrine/coding-standard": "^9.0",
+    "phpcq/runner-bootstrap": "^1.0@dev"
   },
+  "minimum-stability": "dev",
+  "prefer-stable": false,
   "autoload": {
     "psr-4": {
       "Hofff\\Contao\\LanguageRelations\\News\\": "src/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "contao-components/installer": true,
+      "contao/manager-plugin": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "contao-community-alliance/composer-plugin": true
     }
   },
   "extra": {
